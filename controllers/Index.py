@@ -12,11 +12,23 @@ class Index:
 
 
     def search(self,keyword):
-        rows=self.app.db.query("select * from cmdhelp where cmd='%s'" % keyword)
         rs=[]
-        for row in rows:
-            rs.append(str(row['id'])+'. '+unicode(row['cmdinfo'])+"      "+row['description'])
-        return "<brbr>".join(rs)
+        if keyword.startswith('%') and keyword.endswith('%'):
+            rows=self.app.db.query("select * from cmdhelp where cmd like '%s' or cmdinfo like '%s'" %( keyword,keyword))
+            for row in rows:
+                rs.append(str(row['id'])+'. '+unicode(row['cmdinfo'])+"      "+row['description'])
+            return "<brbr>".join(rs)
+        elif keyword.startswith('%') or keyword.endswith('%'):
+            keyword='%'+keyword+'%'
+            rows=self.app.db.query("select * from cmdhelp where cmd like '%s' or cmdinfo like '%s'" %( keyword,keyword))
+            for row in rows:
+                rs.append(str(row['id'])+'. '+unicode(row['cmd']))
+            return "<brbr>".join(rs)
+        else:
+            rows=self.app.db.query("select * from cmdhelp where cmd='%s'" % keyword)
+            for row in rows:
+                rs.append(str(row['id'])+'. '+unicode(row['cmdinfo'])+"      "+row['description'])
+            return "<brbr>".join(rs)
 
     def list(self):
         rows=self.app.db.query("select * from cmdhelp group by cmd")
@@ -40,6 +52,9 @@ class Index:
             return 'success'
         else:
             return 'fail'
+
+    def upgrade(self):
+        return open('cmd').read()
 
     def add(self,cmdinfo='',action='cmd'):
         if cmdinfo=='':

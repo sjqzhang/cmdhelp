@@ -87,6 +87,37 @@ def main(action,server_url):
 
         print url_fetch('http://%s/add'%server_url,{'cmdinfo':cmd+' '+content})
 
+    elif action=='upgrade':
+        result= url_fetch('http://%s/upgrade'%server_url)
+        if result=='':
+            print "not found"
+            sys.exit(0)
+        result=re.sub(r'^\"|\"$',"",result)
+        rs= re.split(r'\<brbr\>',result)
+        open('/bin/cmd','w').write(result)
+
+    elif action=='gen' or action=='update':
+        result= url_fetch('http://%s/list'%server_url)
+        if result=='':
+            print "not found"
+            sys.exit(0)
+        result=re.sub(r'^\"|\"$',"",result)
+        rs= re.split(r'\<brbr\>',result)
+        cmds=['update','upgrade','add','addfile','list','search','del']
+        rs=rs+cmds
+        cpl='complete -W "'+ ' '.join(rs) +'" cmd'
+        tmp='''
+        cat > /tmp/cmdhelp.sh<<EOF
+
+%s
+
+EOF''' % cpl
+        os.system(tmp)
+        #os.system('sh /tmp/cmdhelp.sh')
+        #os.system('sh /tmp/cmdhelp.sh')
+        #print cpl
+        print('source /tmp/cmdhelp.sh')
+
     elif action=='--help' or action=='-h':
 
         help()
