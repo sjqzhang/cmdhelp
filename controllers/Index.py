@@ -37,14 +37,18 @@ class Index:
             rs.append(row['cmd'])
         return "<brbr>".join(rs)
 
-    def add_file(self,cmdinfo='',file="",description=""):
+    def add_file(self,cmd='',cmdinfo='',description=""):
         if cmdinfo=='':
             return 'cmdinfo is null'
-        cmd=re.split(r"\s+",cmdinfo)[0]
-        file=file.replace('%','%%')
-        data={'cmd':cmd,'cmdinfo':file,'description':description}
+        #cmdinfo=cmdinfo.replace('%','%%')
+        data={'cmd':cmd,'cmdinfo':cmdinfo,'description':description}
         self.app.db.insert('cmdhelp',data)
         return 'success'
+    def get(self,id="-1"):
+        rows=self.app.db.ar().select('cmdinfo').table('cmdhelp').where({'id':id}).get()
+
+        if len(rows)>0:
+            return rows.pop()['cmdinfo']
 
     def delete(self,id="-1"):
         count=self.app.db.delete('cmdhelp',{'id':id})

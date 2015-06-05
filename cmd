@@ -66,6 +66,11 @@ def main(action,server_url):
         rs= re.split(r'\<brbr\>',result)
         for r in rs:
             print str(r).decode('utf-8')
+    elif action=='get':
+        if len(sys.argv)>2:
+            print url_fetch('http://%s/get'%server_url,{'id':sys.argv[2]})
+        else:
+            print ""
     elif action=='del':
         if len(sys.argv)>2:
             print url_fetch('http://%s/delete'%server_url,{'id':sys.argv[2]})
@@ -75,6 +80,10 @@ def main(action,server_url):
         if len(sys.argv)<3:
             print "cmd file command file name"
             return
+        if len(sys.argv)==5:
+            description=sys.argv[4]
+        else:
+            description=''
         filepath=sys.argv[3]
         cmd=sys.argv[2]
         content=''
@@ -85,7 +94,7 @@ def main(action,server_url):
             print 'read error'
             return
 
-        print url_fetch('http://%s/add'%server_url,{'cmdinfo':cmd+' '+content})
+        print url_fetch('http://%s/add_file'%server_url,{'cmd':cmd, 'cmdinfo':content,'description':description})
 
     elif action=='upgrade':
         result= url_fetch('http://%s/upgrade'%server_url)
