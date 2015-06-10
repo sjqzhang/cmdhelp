@@ -6,9 +6,23 @@ __author__ = 'xiaozhang'
 
 from codeigniter.system.core.CI_Cache import CI_Cache
 
+import os
 import re
 
 class Index:
+
+
+    def upload(self,**kwargs):
+        file=kwargs['file']
+        open('upload/'+file.filename,'wb').write(file.file.read())
+
+    def download(self,**kwargs):
+        file=kwargs['file']
+        return open(file,'rb').read()
+
+    def listfile(self,**kwargs):
+        return "\n".join(os.listdir('upload'))
+
 
 
     def search(self,keyword):

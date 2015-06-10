@@ -13,8 +13,40 @@ ci=CI_Application(application_path=r'./')
 port=ci.config['server']['port']
 host=ci.config['server']['host']
 
+import cgi
+import os
+
+
+
+
+def download(env, start_response):
+    try:
+        print env
+        code="200 OK"
+
+
+        filename= env['QUERY_STRING'].split('=')[1]
+        filepath='upload/'+filename
+        the_file=open(filepath,'rb')
+        size=os.path.getsize(filepath)
+        response_headers = [ ('Content-Type', 'application/octet-stream'), ('Content-length', str(size)) ]
+        start_response( code, response_headers )
+        return iter(lambda: the_file.read(1024), '')
+
+    except:
+        pass
+
+
+
 def application(env, start_response):
     html=''
+
+
+    path=env['PATH_INFO']
+
+    if path.find('download')>0:
+        return download(env,start_response)
+
 
     code,obj=ci.router.wsgi_route(env)
     # print type(obj)

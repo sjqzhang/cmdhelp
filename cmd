@@ -4,9 +4,45 @@ server_url="127.0.0.1:8044"
 
 import sys,os,urllib2,urllib
 
+import time
 import re
 
 
+
+def download(filename):
+
+    http_url='http://%s/Index/download?file=%s' % (server_url,filename)
+    conn = urllib2.urlopen(http_url)
+    f = open(filename,'wb')
+    f.write(conn.read())
+    f.close()
+
+def upload(filepath):
+    boundary = '----------%s' % hex(int(time.time() * 1000))
+    data = []
+    data.append('--%s' % boundary)
+    fr=open(filepath,'rb')
+    filename=os.path.basename(filepath)
+    data.append('Content-Disposition: form-data; name="%s"; filename="%s"' % ('file',filename))
+    data.append('Content-Type: %s\r\n' % 'image/png')
+    data.append(fr.read())
+    fr.close()
+    data.append('--%s--\r\n' % boundary)
+
+
+    http_url='http://%s/Index/upload' % server_url
+    # http_url='http://172.16.136.98:8005/Index/index'
+    http_body='\r\n'.join(data)
+    try:
+        req=urllib2.Request(http_url, data=http_body)
+        req.add_header('Content-Type', 'multipart/form-data; boundary=%s' % boundary)
+        req.add_header('User-Agent','Mozilla/5.0')
+        req.add_header('Referer','http://remotserver.com/')
+        resp = urllib2.urlopen(req, timeout=5)
+        qrcont=resp.read()
+        print qrcont
+    except Exception,e:
+        print 'http error'
 
 def url_fetch(url,data=None):
         html='';
@@ -58,6 +94,14 @@ def main(action,server_url):
                 print "error param"
                 sys.exit(0)
         print url_fetch('http://%s/add'%server_url,{'cmdinfo':" ".join(sys.argv[2:])})
+    elif action=='listfile':
+        result= url_fetch('http://%s/listfile'%server_url)
+        if result=='':
+            print "not found"
+        result=re.sub(r'^\"|\"$',"",result)
+        rs= re.split(r'\<brbr\>',result)
+        for r in rs:
+            print str(r).decode('utf-8')
     elif action=='list' or action=='l':
         result= url_fetch('http://%s/list'%server_url)
         if result=='':
@@ -76,6 +120,11 @@ def main(action,server_url):
             print url_fetch('http://%s/delete'%server_url,{'id':sys.argv[2]})
         else:
             print ""
+    elif action=='download':
+        download(sys.argv[2])
+    elif action=='upload':
+
+        upload(sys.argv[2])
     elif action=='file' or action=='addfile':
         if len(sys.argv)<3:
             print "cmd file command file name"
