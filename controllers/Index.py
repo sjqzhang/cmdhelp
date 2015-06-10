@@ -15,6 +15,7 @@ class Index:
     def upload(self,**kwargs):
         file=kwargs['file']
         open('upload/'+file.filename,'wb').write(file.file.read())
+        return 'success'
 
     def download(self,**kwargs):
         file=kwargs['file']

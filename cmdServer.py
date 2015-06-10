@@ -21,7 +21,6 @@ import os
 
 def download(env, start_response):
     try:
-        print env
         code="200 OK"
 
 
