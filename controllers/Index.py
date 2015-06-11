@@ -64,6 +64,13 @@ class Index:
 
         if len(rows)>0:
             return rows.pop()['cmdinfo']
+    def delfile(self,id="-1"):
+        path='upload/'+id
+        if os.path.exists(path):
+            os.remove(path)
+            return "sucess"
+        else:
+            return "Not Found"
 
     def delete(self,id="-1"):
         count=self.app.db.delete('cmdhelp',{'id':id})

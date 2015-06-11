@@ -117,6 +117,11 @@ def main(action,server_url):
             print url_fetch('http://%s/get'%server_url,{'id':sys.argv[2]})
         else:
             print ""
+    elif action=='delfile':
+        if len(sys.argv)>2:
+            print url_fetch('http://%s/delfile'%server_url,{'id':sys.argv[2]})
+        else:
+            print ""
     elif action=='del':
         if len(sys.argv)>2:
             print url_fetch('http://%s/delete'%server_url,{'id':sys.argv[2]})
@@ -126,7 +131,6 @@ def main(action,server_url):
         download(sys.argv[2])
     elif action=='upload':
         upload(sys.argv[2])
-        return
     elif action=='file' or action=='addfile':
         if len(sys.argv)<3:
             print "cmd file command file name"
