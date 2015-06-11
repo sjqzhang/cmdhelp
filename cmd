@@ -193,10 +193,10 @@ EOF''' % cpl
             result= url_fetch('http://%s/search'%server_url,{'keyword':action})
         if result=='':
             print "not found"
-        result=re.sub(r'^\"|\"$',"",result)
-        rs= re.split(r'\<brbr\>',result)
-        for r in rs:
-            print r.replace("\\r\\n","\n").replace("\\n","\n")
+        if isinstance(result,unicode):
+            print unicode.encode(result,'utf-8')
+        else:
+            print result
 if len(sys.argv)<2:
     help()
     sys.exit(0)
