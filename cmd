@@ -194,9 +194,12 @@ EOF''' % cpl
         if result=='':
             print "not found"
         if isinstance(result,unicode):
-            print unicode.encode(result,'utf-8')
+            result= unicode.encode(result,'utf-8')
+            rs= re.split(r'\<brbr\>',result)
+            print "\n".join(rs)
         else:
-            print result
+            rs= re.split(r'\<brbr\>',result)
+            print "\n".join(rs)
 if len(sys.argv)<2:
     help()
     sys.exit(0)
