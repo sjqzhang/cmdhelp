@@ -16,7 +16,7 @@ host=ci.config['server']['host']
 import cgi
 import os
 
-
+from urllib import unquote
 
 
 def download(env, start_response):
@@ -25,6 +25,10 @@ def download(env, start_response):
 
 
         filename= env['QUERY_STRING'].split('=')[1]
+	filename=unquote(filename)
+	filename=filename.replace('+',' ')
+	print filename
+
         filepath='upload/'+filename
         the_file=open(filepath,'rb')
         size=os.path.getsize(filepath)
@@ -48,13 +52,16 @@ def application(env, start_response):
 
 
     code,obj=ci.router.wsgi_route(env)
-    # print type(obj)
+    #print type(obj)
     if not isinstance(obj,str) and not isinstance(obj,unicode):
         html=json.dumps(obj)
         start_response(str(code), [('Content-Type', 'application/json')])
     else:
+	try:
+            html=unicode(obj).encode('utf-8')
+	except:
+	    html=obj
         start_response(str(code), [('Content-Type', 'text/html')])
-        html=unicode(obj).encode('utf-8')
     return [str(html)]
 
 

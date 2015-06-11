@@ -9,9 +9,11 @@ import re
 
 
 
-def download(filename):
 
-    http_url='http://%s/Index/download?file=%s' % (server_url,filename)
+def download(filename):
+    data={'file':filename}
+    data=urllib.urlencode(data)
+    http_url='http://%s/Index/download?%s' % (server_url,data)
     conn = urllib2.urlopen(http_url)
     f = open(filename,'wb')
     f.write(conn.read())
@@ -123,8 +125,8 @@ def main(action,server_url):
     elif action=='download':
         download(sys.argv[2])
     elif action=='upload':
-
         upload(sys.argv[2])
+        return
     elif action=='file' or action=='addfile':
         if len(sys.argv)<3:
             print "cmd file command file name"
