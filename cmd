@@ -1,11 +1,12 @@
 #!/usr/bin/python
-
+#encoding=utf-8
 server_url="127.0.0.1:8044"
 
 import sys,os,urllib2,urllib
 
 import time
 import re
+import platform
 
 
 
@@ -45,6 +46,26 @@ def upload(filepath):
         print qrcont
     except Exception,e:
         print 'http error'
+
+
+def sysout(str):
+    out=""
+    out=re.subn(r'\r','',str)
+    if isinstance(str,unicode):
+        out=unicode.encode(str,'utf-8')
+    else:
+        out=str.decode("utf-8")
+    out=re.sub(r'\r','',out)
+    if platform.system().lower()=='windows':
+        rs= re.split(r'\<brbr\>',out)
+        out="\n".join(rs)
+        out=out.encode("GB18030")
+    else:
+            rs= re.split(r'\<brbr\>',out)
+
+            out="\n".join(rs)
+    print out
+
 
 def url_fetch(url,data=None):
         html='';
@@ -100,18 +121,12 @@ def main(action,server_url):
         result= url_fetch('http://%s/listfile'%server_url)
         if result=='':
             print "not found"
-        result=re.sub(r'^\"|\"$',"",result)
-        rs= re.split(r'\<brbr\>',result)
-        for r in rs:
-            print str(r).decode('utf-8')
+        sysout(result)
     elif action=='list' or action=='l':
         result= url_fetch('http://%s/list'%server_url)
         if result=='':
             print "not found"
-        result=re.sub(r'^\"|\"$',"",result)
-        rs= re.split(r'\<brbr\>',result)
-        for r in rs:
-            print str(r).decode('utf-8')
+        sysout(result)
     elif action=='get':
         if len(sys.argv)>2:
             print url_fetch('http://%s/get'%server_url,{'id':sys.argv[2]})
@@ -193,13 +208,8 @@ EOF''' % cpl
             result= url_fetch('http://%s/search'%server_url,{'keyword':action})
         if result=='':
             print "not found"
-        if isinstance(result,unicode):
-            result= unicode.encode(result,'utf-8')
-            rs= re.split(r'\<brbr\>',result)
-            print "\n".join(rs)
-        else:
-            rs= re.split(r'\<brbr\>',result)
-            print "\n".join(rs)
+        # print result.decode('utf-8').encode('GB18030')
+        sysout(result)
 if len(sys.argv)<2:
     help()
     sys.exit(0)
