@@ -28,6 +28,11 @@ class Index:
 
     def search(self,keyword):
         rs=[]
+
+        if keyword.startswith('http'):
+            http=os.popen('w3m '+'"'+keyword+'"')
+            return http.read().decode('utf-8')
+
         if keyword.startswith('%') and keyword.endswith('%'):
             rows=self.app.db.query("select * from cmdhelp where cmd like '%s' or cmdinfo like '%s'" %( keyword,keyword))
             for row in rows:
