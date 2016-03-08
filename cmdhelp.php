@@ -673,7 +673,7 @@ class CmdHelp{
         if( preg_match('/^\%/', $keyword)){
             $sql="select * from cmdhelp where cmd like '%$keyword%' or cmdinfo like '$keyword'";
         } else{
-            $sql="select * from cmdhelp where cmd like  '%$keyword%'";
+            $sql="select * from cmdhelp where cmd = '$keyword'";
         }
         $rows=$this->db->query($sql);
         foreach($rows as $row){
@@ -729,7 +729,8 @@ class CmdHelp{
     }
 
 
-    function delete($id){
+    function delete($id=0){
+        $id=$_REQUEST['id'];
         $id=mysql_real_escape_string($id);
         $sql="delete from cmdhelp where id='$id'";
         $rows=$this->db->query($sql);
@@ -749,10 +750,21 @@ class CmdHelp{
         $cmds=preg_split('/\s+/',$cmdinfo);
         $cmd=$cmds[0];
         $cmdinfo=preg_replace("/^\s*${cmd}/",'', $cmdinfo);
+        
+        $description='';
+        
+        if(strripos($cmdinfo,'//')>0) {
+        
+         $description= substr($cmdinfo,strripos($cmdinfo,'//')+2, strlen($cmdinfo));            
+         $cmdinfo= substr($cmdinfo,0, strripos($cmdinfo,'//'));
+         
 
+        }
+      
         $cmd=mysql_real_escape_string($cmd);
         $cmdinfo=mysql_real_escape_string($cmdinfo);
-        $description="";
+        $description=mysql_real_escape_string($description);
+
         $sql="INSERT INTO cmdhelp
 	(
 	cmd,
