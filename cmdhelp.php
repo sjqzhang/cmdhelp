@@ -529,19 +529,20 @@ class DB
     }
     function getResult($rs)
     {
-        if($rs)
+        if(is_resource($rs))
         {
             $rows=array();
             $i=0;
             $func =$this->func_fetch_array;
-            #print_r($rs);die;
             while($row= $func($rs))
             {
                 $rows[$i]=$row;
                 $i=$i+1;
             }
             return $rows;
-        } else
+        } else if(is_bool($rs)){
+            return $rs;
+        }else
         {
             return null;
         }
@@ -587,6 +588,8 @@ class DB
         $func=$this->func_query;
         $rs=$func($sql,$this->con);
         $sql= trim($sql);
+        $sql=trim($sql);
+        //echo $sql;
         if(preg_match("/^select|show/im",$sql))
         {
             return $this->getResult($rs);
@@ -639,6 +642,13 @@ class DB
 
 // $db=new DB('127.0.0.1','root','1016','test');
 
+//  $db_local=new DB('172.16.1.25','agent_login','KM234ansSONiPUSf','as_mobile','mssql');
+//  $db_remote=new DB('58.63.253.77','meizuaspnet','JMS33quwGfMfPWUd','meizu_db_new','mssql');
+
+
+//$db=new DB('172.16.3.92','root','meizu.com','cmdhelp','mysql');
+//   $db_local=new DB('127.0.0.1','root','1016','test');
+//    $db_local=new DB('172.16.10.211','root','meizu.com','meizu_bbs');
 
 $db=new DB(SAE_MYSQL_HOST_M,SAE_MYSQL_USER,SAE_MYSQL_PASS,'app_cmdhelp',SAE_MYSQL_PORT,'mysql');
 //mysql_connect(SAE_MYSQL_HOST_M.':'.SAE_MYSQL_PORT,SAE_MYSQL_USER,SAE_MYSQL_PASS);
@@ -661,9 +671,9 @@ class CmdHelp{
         $keyword=mysql_real_escape_string($keyword);
         $result='';
         if( preg_match('/^\%/', $keyword)){
-            $sql="select * from cmdhelp where cmd like '$keyword' or cmdinfo like '$keyword'";
+            $sql="select * from cmdhelp where cmd like '%$keyword%' or cmdinfo like '$keyword'";
         } else{
-            $sql="select * from cmdhelp where cmd = '$keyword'";
+            $sql="select * from cmdhelp where cmd like  '%$keyword%'";
         }
         $rows=$this->db->query($sql);
         foreach($rows as $row){
@@ -719,8 +729,7 @@ class CmdHelp{
     }
 
 
-    function delete($id=0){
-        $id=$_REQUEST['id'];
+    function delete($id){
         $id=mysql_real_escape_string($id);
         $sql="delete from cmdhelp where id='$id'";
         $rows=$this->db->query($sql);
@@ -767,10 +776,7 @@ class CmdHelp{
     }
 
     function route(){
-        
-       
 
-  
        $action= substr($_SERVER['PATH_INFO'],1);
        if($action=='list'){
            echo $this->group_list();
