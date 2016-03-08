@@ -671,13 +671,18 @@ class CmdHelp{
         $keyword=mysql_real_escape_string($keyword);
         $result='';
         if( preg_match('/^\%/', $keyword)){
-            $sql="select * from cmdhelp where cmd like '%$keyword%' or cmdinfo like '$keyword'";
+            $sql="select * from cmdhelp where cmd like '%$keyword%' or cmdinfo like '%$keyword%' or description like '%$keyword%'";
         } else{
             $sql="select * from cmdhelp where cmd = '$keyword'";
         }
         $rows=$this->db->query($sql);
         foreach($rows as $row){
-            $result.=$row['id'].".".$row['cmdinfo']."\t".$row['description']."\n";
+            $description=trim($row['description']);
+            if(empty($description)) {
+             $result.=$row['id'].".".$row['cmdinfo']."\t".$row['description']."\n";
+            } else {
+                $result.=$row['id'].".".$row['cmdinfo']."\t//".$row['description']."\n";
+            }
         }
         return $result;
 
@@ -742,6 +747,8 @@ class CmdHelp{
     }
 
     function add($cmdinfo='',$action='cmd'){
+        
+        //var_dump($_REQUEST);die;
         $cmdinfo=$_REQUEST['cmdinfo'];
         $action=$_REQUEST['action'];
         if($cmdinfo==""){
@@ -749,7 +756,7 @@ class CmdHelp{
         }
         $cmds=preg_split('/\s+/',$cmdinfo);
         $cmd=$cmds[0];
-        $cmdinfo=preg_replace("/^\s*${cmd}/",'', $cmdinfo);
+        //$cmdinfo=preg_replace("/^\s*${cmd}/",'', $cmdinfo);
         
         $description='';
         
