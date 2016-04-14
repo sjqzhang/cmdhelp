@@ -3,10 +3,11 @@ import logging
 
 
 db={
+    'type':'sqlite',
     'host':'127.0.0.1',
     'user':'root',
     'passwd':'root',
-    'database':'cmdhelp',
+    'database':'cmdhelp.sqlite3',
     'charset':'utf8',
     'maxconnections':30,
     'blocking':True,
